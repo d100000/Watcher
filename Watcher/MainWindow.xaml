@@ -1,0 +1,21 @@
+﻿<Window x:Class="Watcher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Watcher"
+        WindowState="Normal"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
+        Name="WatcherMainWindows"
+        StateChanged="MainWindow_OnStateChanged"
+        Closing="MainWindow_OnClosing"
+        
+        mc:Ignorable="d"
+        Title="程序记录软件" Height="350" Width="525">
+    <Grid>
+        <ListBox  Name="MainListBox"  HorizontalAlignment="Left" Height="279" Margin="10,30,0,0" VerticalAlignment="Top" Width="497"/>
+        <TextBlock Name="ForegroundTextBox" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>

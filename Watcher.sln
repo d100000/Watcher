@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watcher", "Watcher\Watcher.csproj", "{B569F176-0BFD-4CAD-84D3-B82C5A0587EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easyliter", "Easyliter\Easyliter.csproj", "{6BDE6909-3BB8-4D69-8E37-9A9EAD00A4B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helper", "NetHelper\Helper.csproj", "{12907A3A-E6B3-4575-8A58-4B568647C402}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B569F176-0BFD-4CAD-84D3-B82C5A0587EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B569F176-0BFD-4CAD-84D3-B82C5A0587EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B569F176-0BFD-4CAD-84D3-B82C5A0587EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B569F176-0BFD-4CAD-84D3-B82C5A0587EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BDE6909-3BB8-4D69-8E37-9A9EAD00A4B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BDE6909-3BB8-4D69-8E37-9A9EAD00A4B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BDE6909-3BB8-4D69-8E37-9A9EAD00A4B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BDE6909-3BB8-4D69-8E37-9A9EAD00A4B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12907A3A-E6B3-4575-8A58-4B568647C402}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12907A3A-E6B3-4575-8A58-4B568647C402}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12907A3A-E6B3-4575-8A58-4B568647C402}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12907A3A-E6B3-4575-8A58-4B568647C402}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A0AAE257-2ABD-4D33-BF0F-0D9B38CCD240}
+	EndGlobalSection
+EndGlobal
