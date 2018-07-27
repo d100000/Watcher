@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Watcher"
+        xmlns:userControlerModel="clr-namespace:Watcher.UserControlerModel"
+        xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         WindowState="Normal"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanMinimize"
@@ -12,19 +14,35 @@
         Closing="MainWindow_OnClosing"
         
         mc:Ignorable="d"
-        Title="程序记录软件" Height="350" Width="525">
+        Title="程序记录软件" Height="350" Width="1000">
     <Grid>
-        <ListBox  Name="MainListBox"  HorizontalAlignment="Left" Height="279" Margin="10,30,0,0" VerticalAlignment="Top" Width="499">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Height="25" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" >
-                        <Image Height="18" Source="{Binding IconPath}" Stretch="Fill" Width="18" VerticalAlignment="Center" HorizontalAlignment="Center"></Image>
-                        <TextBlock Margin="10 0 0 0" Height="18" Text="{Binding MainTitle}" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-            <TextBlock Name="ForegroundTextBox" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <Grid  Width="500">
+                <wpf:CartesianChart  Name="MainRowSeries" LegendLocation="Bottom">
+                    <wpf:CartesianChart.AxisY>
+                        <wpf:Axis Title="Time" Labels="{Binding Labels}"></wpf:Axis>
+                    </wpf:CartesianChart.AxisY>
+                    <wpf:CartesianChart.DataTooltip>
+                        <wpf:DefaultTooltip SelectionMode="SharedYValues"></wpf:DefaultTooltip>
+                    </wpf:CartesianChart.DataTooltip>
+                </wpf:CartesianChart>
+            </Grid>
+            <Grid>
+                <ListBox  Name="MainListBox"  HorizontalAlignment="Left" Height="279" VerticalAlignment="Top" Width="486">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Height="25" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" >
+                                <Image Height="18" Source="{Binding IconPath}" Stretch="Fill" Width="18" VerticalAlignment="Center" HorizontalAlignment="Center"></Image>
+                                <TextBlock Margin="10 0 0 0" Height="18" Text="{Binding MainTitle}" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                
+            </Grid>
 
+        </StackPanel>
+        <TextBlock Name="ForegroundTextBox" HorizontalAlignment="Left" Margin="10,6,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
     </Grid>
 </Window>
+

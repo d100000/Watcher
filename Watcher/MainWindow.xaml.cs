@@ -15,6 +15,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Helper;
+using LiveCharts;
+using LiveCharts.Wpf;
 using Watcher.db;
 using Watcher.Entity;
 using Application = System.Windows.Application;
@@ -44,6 +46,14 @@ namespace Watcher
 
         private readonly System.Timers.Timer _t = new System.Timers.Timer(1000);
 
+
+        #region Rowseries
+
+        public SeriesCollection SeriesCollection { get; set; }
+        public List<string> Labels { get; set; }
+
+        #endregion 
+
         #region  Windows API
 
         [DllImport("user32.dll")]
@@ -66,6 +76,18 @@ namespace Watcher
             _t.AutoReset = true;
 
             _t.Enabled = true;
+
+            SeriesCollection = new SeriesCollection
+            {
+                new RowSeries
+                {
+                    Title = "当前运行情况",
+                    Values = new ChartValues<long> {  }
+                }
+            };
+
+            Labels=new List<string>();
+
         }
 
         public void ProcessTimer(object source, System.Timers.ElapsedEventArgs e)
@@ -89,7 +111,7 @@ namespace Watcher
             foreach (var p in ps)
             {
 
-                if (p.MainWindowHandle != IntPtr.Zero && p.MainWindowTitle != "")
+                if (p.MainWindowHandle != IntPtr.Zero && p.MainWindowTitle != ""&&!RunningDictionary.ContainsKey(p.MainWindowHandle))
                 {
                     try
                     {
@@ -112,14 +134,13 @@ namespace Watcher
             string activiteProssesName = RunningDictionary.ContainsKey(activiteNo)
                 ? RunningDictionary[activiteNo].ProcessInfoData.MainWindowTitle
                 : "未选中应用";
-
+            var currentTime = Common.GetTimeStamp(DateTime.Now);
             // 切换应用时触发
             if (RunningDictionary.ContainsKey(activiteNo) && activiteNo != NowProssesId)
             {
                 if (_currentRecordInfo != null)
                 {
                     // 更新旧进程的结束时间
-                    var currentTime = Common.GetTimeStamp(DateTime.Now);
                     MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time) }, new { _currentRecordInfo.record_id });
                 }
 
@@ -129,12 +150,25 @@ namespace Watcher
                 NowProssesId = activiteNo;
                 NowProcess = runningProcess;
 
+                // 添加前端变化
+                SeriesCollection[0].Values.Add(currentTime - _currentRecordInfo.begin_time);
+                Labels.Add(NowProcess.ProcessName);
+
+                if (SeriesCollection[0].Values.Count == 9)
+                {
+                    SeriesCollection[0].Values.RemoveAt(0);
+                    Labels.RemoveAt(0);
+                }
+
                 try
                 {
                     Dispatcher.Invoke(() =>
                     {
                         ForegroundTextBox.Text = activiteProssesName;
                         MainListBox.ItemsSource = RunningDictionary.Values;
+                        MainRowSeries.Series = SeriesCollection;
+
+                        DataContext = this;
                     });
                 }
                 catch (Exception e)
@@ -145,12 +179,20 @@ namespace Watcher
             }
             else
             {
+                SeriesCollection[0].Values[SeriesCollection[0].Values.Count-1] =
+                    currentTime - _currentRecordInfo.begin_time;
                 if (_countUpdate == 5)// 五秒主动更新一次数据库
                 {
-                    var currentTime = Common.GetTimeStamp(DateTime.Now);
+                    currentTime = Common.GetTimeStamp(DateTime.Now);
                     MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time) }, new { _currentRecordInfo.record_id });
                     _countUpdate = 0;
                 }
+                // 更新图表信息
+                Dispatcher.Invoke(() =>
+                {
+                    MainRowSeries.Series = SeriesCollection;
+                    DataContext = this;
+                });
                 _countUpdate++;
             }
 
