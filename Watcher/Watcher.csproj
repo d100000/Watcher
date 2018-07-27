@@ -94,6 +94,7 @@
     </Compile>
     <Compile Include="db\DbBase.cs" />
     <Compile Include="db\RecordDbService.cs" />
+    <Compile Include="Entity\ProcessInfo.cs" />
     <Compile Include="Entity\recode_info.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

@@ -9,6 +9,9 @@ namespace Helper
 {
     /// <summary>
     /// XML 解析类
+    /// 董小保
+    /// QQ：936973474
+    /// 
     /// </summary>
     public class XmlHelper
     {

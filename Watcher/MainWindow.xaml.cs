@@ -7,9 +7,11 @@ using System.Windows;
 // system prosses
 
 using System.Diagnostics;
+using System.Drawing;
 using System.Threading;
 
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Helper;
 using Watcher.db;
@@ -26,7 +28,7 @@ namespace Watcher
 
         public List<string> ProcessList = new List<string>();
         public List<string> ProcessListAll = new List<string>();
-        public Dictionary<IntPtr, Process> RunningDictionary = new Dictionary<IntPtr, Process>();
+        public Dictionary<IntPtr, ProcessInfo> RunningDictionary = new Dictionary<IntPtr, ProcessInfo>();
 
         public RecordDbService MainRecordDbService;
 
@@ -46,6 +48,20 @@ namespace Watcher
 
         [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
+        private const int MaxPath = 260;
+        public const int ProcessAllAccess = 0x000F0000 | 0x00100000 | 0xFFF;
+        [DllImport("coredll.dll")]
+        public static extern int GetWindowThreadProcessId(IntPtr hWnd, ref int lpdwProcessId);
+        [DllImport("coredll.dll")]
+        public static extern IntPtr OpenProcess(int fdwAccess, int fInherit, int IDProcess);
+        [DllImport("coredll.dll")]
+        public static extern bool TerminateProcess(IntPtr hProcess, int uExitCode);
+        [DllImport("coredll.dll")]
+        public static extern bool CloseHandle(IntPtr hObject);
+        [DllImport("Coredll.dll", EntryPoint = "GetModuleFileName")]
+        private static extern uint GetModuleFileName(IntPtr hModule, [Out] StringBuilder lpszFileName, int nSize);
+        [DllImport("coredll.dll", SetLastError = true)]
+        private static extern IntPtr ExtractIconEx(string fileName, int index, ref IntPtr hIconLarge, ref IntPtr hIconSmall, uint nIcons);
 
         #endregion
 
@@ -53,11 +69,9 @@ namespace Watcher
         public MainWindow()
         {
             InitializeComponent();
-            MainRecordDbService = new RecordDbService();
+            MainRecordDbService = new RecordDbService();// 初始化
 
             SetIcon();// 最小化
-
-            //实例化Timer类，设置间隔时间为10000毫秒；     
 
             _t.Elapsed += ProcessTimer;
 
@@ -84,7 +98,7 @@ namespace Watcher
             _timmerLock = true;
             var ps = Process.GetProcesses(Environment.MachineName);
             ProcessList = new List<string>();
-            RunningDictionary = new Dictionary<IntPtr, Process>();
+            RunningDictionary = new Dictionary<IntPtr, ProcessInfo>();
             var activiteNo = GetForegroundWindow();
             foreach (var p in ps)
             {
@@ -94,7 +108,14 @@ namespace Watcher
                     ProcessListAll.Add(info);
                     if (p.MainWindowHandle != IntPtr.Zero && p.MainWindowTitle != "")
                     {
-                        RunningDictionary.Add(p.MainWindowHandle, p);
+                        Icon icon = GetSmallIconFromHandle(p.MainWindowHandle);
+
+                        RunningDictionary.Add(p.MainWindowHandle, new ProcessInfo()
+                        {
+                            ProcessInfoData = p,
+                            ProcessIcon = icon
+
+                        });
                         ProcessList.Add(p.MainWindowTitle);
                     }
                 }
@@ -105,7 +126,7 @@ namespace Watcher
             }
 
            string activiteProssesName = RunningDictionary.ContainsKey(activiteNo)
-               ? RunningDictionary[activiteNo].MainWindowTitle
+               ? RunningDictionary[activiteNo].ProcessInfoData.MainWindowTitle
                : "未选中应用";
 
             // 切换应用时触发
@@ -119,7 +140,7 @@ namespace Watcher
                 }
 
                 // 插入新进程的数据
-                var runningProcess = RunningDictionary[activiteNo];
+                var runningProcess = RunningDictionary[activiteNo].ProcessInfoData;
                 _currentRecordInfo=MainRecordDbService.AddNewRecord(runningProcess, NowProcess);
                 NowProssesId = activiteNo;
                 NowProcess = runningProcess;
@@ -128,7 +149,7 @@ namespace Watcher
                 {
                     Dispatcher.Invoke(() => {
                         ForegroundTextBox.Text = activiteProssesName;
-                        MainListBox.ItemsSource = RunningDictionary.Values.Select(c => c.MainWindowTitle);
+                        MainListBox.ItemsSource = RunningDictionary.Values.Select(c => c.ProcessInfoData.MainWindowTitle);
                     });
                 }
                 catch (Exception e)
@@ -139,7 +160,7 @@ namespace Watcher
             }
             else
             {
-                if (_countUpdate == 5)
+                if (_countUpdate == 5)// 五秒主动更新一次数据库
                 {
                     var currentTime = Common.GetTimeStamp(DateTime.Now);
                     MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time) }, new {_currentRecordInfo.record_id });
@@ -153,6 +174,50 @@ namespace Watcher
             _timmerLock = false;
 
         }
+
+        #region  系统方法
+
+        /// <summary>
+        /// 通过句柄获取运行程序路径
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <returns></returns>
+        public static String GetAppRunPathFromHandle(IntPtr hwnd)
+        {
+            int pId = 0;
+            GetWindowThreadProcessId(hwnd, ref pId);
+            var pHandle = OpenProcess(ProcessAllAccess, 0, pId);
+            StringBuilder sb = new StringBuilder(MaxPath);
+            GetModuleFileName(pHandle, sb, sb.Capacity);
+            CloseHandle(pHandle);
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// 根据句柄获取运行程序小图标 //当然也可以获取大图标
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <returns></returns>
+        private Icon GetSmallIconFromHandle(IntPtr hwnd)
+        {
+            IntPtr hLargeIcon = IntPtr.Zero;
+            IntPtr hSmallIcon = IntPtr.Zero;
+            String filePath = GetAppRunPathFromHandle(hwnd);
+
+            ExtractIconEx(filePath, 0, ref hLargeIcon, ref hSmallIcon, 1);
+            Icon icon = null;
+            try
+            {
+                icon = System.Drawing.Icon.FromHandle(hSmallIcon);
+            }
+            catch (Exception e)
+            {
+                Console.Out.WriteLine(e.Message);
+            }
+            return icon;
+        }
+
+        #endregion 
 
         #region 最小化隐藏
 
