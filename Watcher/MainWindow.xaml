@@ -14,8 +14,17 @@
         mc:Ignorable="d"
         Title="程序记录软件" Height="350" Width="525">
     <Grid>
-        <ListBox  Name="MainListBox"  HorizontalAlignment="Left" Height="279" Margin="10,30,0,0" VerticalAlignment="Top" Width="497"/>
-        <TextBlock Name="ForegroundTextBox" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <ListBox  Name="MainListBox"  HorizontalAlignment="Left" Height="279" Margin="10,30,0,0" VerticalAlignment="Top" Width="499">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Height="25" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" >
+                        <Image Height="18" Source="{Binding IconPath}" Stretch="Fill" Width="18" VerticalAlignment="Center" HorizontalAlignment="Center"></Image>
+                        <TextBlock Margin="10 0 0 0" Height="18" Text="{Binding MainTitle}" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+            <TextBlock Name="ForegroundTextBox" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

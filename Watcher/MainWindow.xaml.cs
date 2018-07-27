@@ -8,6 +8,7 @@ using System.Windows;
 
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Threading;
 
 using System.Runtime.InteropServices;
@@ -27,7 +28,6 @@ namespace Watcher
     {
 
         public List<string> ProcessList = new List<string>();
-        public List<string> ProcessListAll = new List<string>();
         public Dictionary<IntPtr, ProcessInfo> RunningDictionary = new Dictionary<IntPtr, ProcessInfo>();
 
         public RecordDbService MainRecordDbService;
@@ -40,7 +40,7 @@ namespace Watcher
 
         private bool _timmerLock;
 
-        private recode_info _currentRecordInfo ;
+        private recode_info _currentRecordInfo;
 
         private readonly System.Timers.Timer _t = new System.Timers.Timer(1000);
 
@@ -48,20 +48,6 @@ namespace Watcher
 
         [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
-        private const int MaxPath = 260;
-        public const int ProcessAllAccess = 0x000F0000 | 0x00100000 | 0xFFF;
-        [DllImport("coredll.dll")]
-        public static extern int GetWindowThreadProcessId(IntPtr hWnd, ref int lpdwProcessId);
-        [DllImport("coredll.dll")]
-        public static extern IntPtr OpenProcess(int fdwAccess, int fInherit, int IDProcess);
-        [DllImport("coredll.dll")]
-        public static extern bool TerminateProcess(IntPtr hProcess, int uExitCode);
-        [DllImport("coredll.dll")]
-        public static extern bool CloseHandle(IntPtr hObject);
-        [DllImport("Coredll.dll", EntryPoint = "GetModuleFileName")]
-        private static extern uint GetModuleFileName(IntPtr hModule, [Out] StringBuilder lpszFileName, int nSize);
-        [DllImport("coredll.dll", SetLastError = true)]
-        private static extern IntPtr ExtractIconEx(string fileName, int index, ref IntPtr hIconLarge, ref IntPtr hIconSmall, uint nIcons);
 
         #endregion
 
@@ -102,32 +88,30 @@ namespace Watcher
             var activiteNo = GetForegroundWindow();
             foreach (var p in ps)
             {
-                try
+
+                if (p.MainWindowHandle != IntPtr.Zero && p.MainWindowTitle != "")
                 {
-                    var info = p.Id + "  " + p.ProcessName + "  " + p.MainWindowTitle + "  ";
-                    ProcessListAll.Add(info);
-                    if (p.MainWindowHandle != IntPtr.Zero && p.MainWindowTitle != "")
+                    try
                     {
-                        Icon icon = GetSmallIconFromHandle(p.MainWindowHandle);
-
-                        RunningDictionary.Add(p.MainWindowHandle, new ProcessInfo()
-                        {
-                            ProcessInfoData = p,
-                            ProcessIcon = icon
-
-                        });
-                        ProcessList.Add(p.MainWindowTitle);
+                        GetIcon(p.MainModule.FileName, p.ProcessName);
                     }
+                    catch (Exception ex)
+                    {
+                        // ignored
+                    }
+
+                    RunningDictionary.Add(p.MainWindowHandle, new ProcessInfo()
+                    {
+                        ProcessInfoData = p,
+                    });
+                    ProcessList.Add(p.MainWindowTitle);
                 }
-                catch (Exception)
-                {
-                    // ignored
-                }
+
             }
 
-           string activiteProssesName = RunningDictionary.ContainsKey(activiteNo)
-               ? RunningDictionary[activiteNo].ProcessInfoData.MainWindowTitle
-               : "未选中应用";
+            string activiteProssesName = RunningDictionary.ContainsKey(activiteNo)
+                ? RunningDictionary[activiteNo].ProcessInfoData.MainWindowTitle
+                : "未选中应用";
 
             // 切换应用时触发
             if (RunningDictionary.ContainsKey(activiteNo) && activiteNo != NowProssesId)
@@ -141,15 +125,16 @@ namespace Watcher
 
                 // 插入新进程的数据
                 var runningProcess = RunningDictionary[activiteNo].ProcessInfoData;
-                _currentRecordInfo=MainRecordDbService.AddNewRecord(runningProcess, NowProcess);
+                _currentRecordInfo = MainRecordDbService.AddNewRecord(runningProcess, NowProcess);
                 NowProssesId = activiteNo;
                 NowProcess = runningProcess;
 
                 try
                 {
-                    Dispatcher.Invoke(() => {
+                    Dispatcher.Invoke(() =>
+                    {
                         ForegroundTextBox.Text = activiteProssesName;
-                        MainListBox.ItemsSource = RunningDictionary.Values.Select(c => c.ProcessInfoData.MainWindowTitle);
+                        MainListBox.ItemsSource = RunningDictionary.Values;
                     });
                 }
                 catch (Exception e)
@@ -163,7 +148,7 @@ namespace Watcher
                 if (_countUpdate == 5)// 五秒主动更新一次数据库
                 {
                     var currentTime = Common.GetTimeStamp(DateTime.Now);
-                    MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time) }, new {_currentRecordInfo.record_id });
+                    MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time) }, new { _currentRecordInfo.record_id });
                     _countUpdate = 0;
                 }
                 _countUpdate++;
@@ -177,47 +162,39 @@ namespace Watcher
 
         #region  系统方法
 
-        /// <summary>
-        /// 通过句柄获取运行程序路径
-        /// </summary>
-        /// <param name="hwnd"></param>
-        /// <returns></returns>
-        public static String GetAppRunPathFromHandle(IntPtr hwnd)
-        {
-            int pId = 0;
-            GetWindowThreadProcessId(hwnd, ref pId);
-            var pHandle = OpenProcess(ProcessAllAccess, 0, pId);
-            StringBuilder sb = new StringBuilder(MaxPath);
-            GetModuleFileName(pHandle, sb, sb.Capacity);
-            CloseHandle(pHandle);
-            return sb.ToString();
-        }
 
         /// <summary>
-        /// 根据句柄获取运行程序小图标 //当然也可以获取大图标
+        /// 通过程序路径获取图标信息
         /// </summary>
-        /// <param name="hwnd"></param>
+        /// <param name="FilePath"></param>
+        /// <param name="appName"></param>
         /// <returns></returns>
-        private Icon GetSmallIconFromHandle(IntPtr hwnd)
+        public Icon GetIcon(string FilePath, string appName)
         {
-            IntPtr hLargeIcon = IntPtr.Zero;
-            IntPtr hSmallIcon = IntPtr.Zero;
-            String filePath = GetAppRunPathFromHandle(hwnd);
 
-            ExtractIconEx(filePath, 0, ref hLargeIcon, ref hSmallIcon, 1);
-            Icon icon = null;
-            try
+            var returnData = new List<Icon>();
+            var imageList = new ImageList();
+
+            var icon = System.Drawing.Icon.ExtractAssociatedIcon(FilePath); //图标添加进imageList中
+            imageList.Images.Add(icon);
+            returnData.Add(icon);
+
+            if (!Directory.Exists(Environment.CurrentDirectory + $"\\icon"))
             {
-                icon = System.Drawing.Icon.FromHandle(hSmallIcon);
+                Directory.CreateDirectory(Environment.CurrentDirectory + $"\\icon");
             }
-            catch (Exception e)
+
+            if (!File.Exists(Environment.CurrentDirectory + $"\\icon\\{appName}.png"))
             {
-                Console.Out.WriteLine(e.Message);
+                System.IO.FileStream fs = new System.IO.FileStream(Environment.CurrentDirectory + $"\\icon\\{appName}.png", System.IO.FileMode.Create);
+                imageList.ColorDepth = ColorDepth.Depth32Bit;
+                imageList.Images[0].Save(fs, System.Drawing.Imaging.ImageFormat.Png);
+                fs.Close();
             }
-            return icon;
+            return returnData[0];
         }
 
-        #endregion 
+        #endregion
 
         #region 最小化隐藏
 
@@ -330,7 +307,7 @@ namespace Watcher
         {
             // 记录退出时间
             var currentTime = Common.GetTimeStamp(DateTime.Now);
-            MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time) }, new {_currentRecordInfo.record_id });
+            MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time) }, new { _currentRecordInfo.record_id });
             _notifyIcon.Visible = false;
             Hide();
             GetProssesList();

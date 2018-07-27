@@ -13,15 +13,16 @@ namespace Watcher.Entity
     {
         private IntPtr _id;
         private Process _processInfoData;
-        private Icon _processIcon;
+        private Image _processIcon;
+        private string _mainTitle;
+        private string _iconPath;
+        
 
 
         public IntPtr Id { get => _id; set => _id = value; }
         public Process ProcessInfoData { get => _processInfoData; set => _processInfoData = value; }
-        public Icon ProcessIcon { get => _processIcon; set => _processIcon = value; }
-
-
-
-
+        public Image ProcessIcon { get => _processIcon; set => _processIcon = value; }
+        public string MainTitle { get => _processInfoData.MainWindowTitle;  }
+        public string IconPath { get => Environment.CurrentDirectory + $"\\icon\\{_processInfoData.ProcessName}.png"; set => _iconPath = value; }
     }
 }
