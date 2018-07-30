@@ -30,8 +30,11 @@ namespace Watcher
     {
 
         public List<string> ProcessList = new List<string>();
-        public Dictionary<IntPtr, ProcessInfo> RunningDictionary = new Dictionary<IntPtr, ProcessInfo>();
 
+        public Dictionary<IntPtr, ProcessInfo> RunningDictionary = new Dictionary<IntPtr, ProcessInfo>();
+        /// <summary>
+        /// 记录表DB model
+        /// </summary>
         public RecordDbService MainRecordDbService;
 
         public bool MonitorSwitch = true;
@@ -45,7 +48,6 @@ namespace Watcher
         private recode_info _currentRecordInfo;
 
         private readonly System.Timers.Timer _t = new System.Timers.Timer(1000);
-
 
         #region Rowseries
 
@@ -61,7 +63,9 @@ namespace Watcher
 
         #endregion
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
@@ -77,6 +81,7 @@ namespace Watcher
 
             _t.Enabled = true;
 
+            // 主页面条形图数据
             SeriesCollection = new SeriesCollection
             {
                 new RowSeries
@@ -86,7 +91,7 @@ namespace Watcher
                 }
             };
 
-            Labels=new List<string>();
+            Labels = new List<string>();
 
         }
 
@@ -111,7 +116,7 @@ namespace Watcher
             foreach (var p in ps)
             {
 
-                if (p.MainWindowHandle != IntPtr.Zero && p.MainWindowTitle != ""&&!RunningDictionary.ContainsKey(p.MainWindowHandle))
+                if (p.MainWindowHandle != IntPtr.Zero && p.MainWindowTitle != "" && !RunningDictionary.ContainsKey(p.MainWindowHandle))
                 {
                     try
                     {
@@ -168,7 +173,7 @@ namespace Watcher
                         MainListBox.ItemsSource = RunningDictionary.Values;
                         MainRowSeries.Series = SeriesCollection;
 
-                        DataContext = this;
+                        DataContext = this;// 触发UI 进程进行数据刷新
                     });
                 }
                 catch (Exception e)
@@ -179,7 +184,7 @@ namespace Watcher
             }
             else
             {
-                SeriesCollection[0].Values[SeriesCollection[0].Values.Count-1] =
+                SeriesCollection[0].Values[SeriesCollection[0].Values.Count - 1] =
                     currentTime - _currentRecordInfo.begin_time;
                 if (_countUpdate == 5)// 五秒主动更新一次数据库
                 {
