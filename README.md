@@ -15,5 +15,4 @@
  - 添加发呆判断，更加实时监控你的一举一动
  
  ## 演示Demo
- ![blockchain](http://api.bobdong.cn/public/static/Win/watcher/WatcherDemo.gif "区块链")
  ![Watcher Demo](http://api.bobdong.cn/public/static/Win/watcher/WatcherDemo.gif "Watcher Demo")
