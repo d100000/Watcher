@@ -15,4 +15,4 @@
  - 添加发呆判断，更加实时监控你的一举一动
  
  ## 演示Demo
- ![Watcher Demo](http://api.bobdong.cn/public/static/Win/watcher/WatcherDemo.gif "Watcher Demo")
+ ![Watcher Demo](http://api.bobdong.cn/public/static/Win/watcher/WatcherDemo.gif )
