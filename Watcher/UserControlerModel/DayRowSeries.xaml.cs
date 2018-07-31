@@ -18,6 +18,7 @@ using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
 using Watcher.db;
+using Watcher.Entity;
 
 namespace Watcher.UserControlerModel
 {
@@ -39,23 +40,9 @@ namespace Watcher.UserControlerModel
         {
             InitializeComponent();
 
-            SeriesCollection = new SeriesCollection
-            {
-                new PieSeries()
-                {
-                    Title = "2015",
-                    Values = new ChartValues<double> { 50 }
-                },
-                new PieSeries()
-                {
-                    Title = "2017",
-                    Values = new ChartValues<double> { 50 }
-                }
-            };
+            SeriesCollection = new SeriesCollection();
 
             new Thread(GetDailyData).Start();
-
-            DataContext = this;
         }
 
 
@@ -63,43 +50,75 @@ namespace Watcher.UserControlerModel
 
         public void GetDailyData()
         {
+            PieDataContent = new Dictionary<string, long>();
             var data = MainRecordDbService.QueryByDate(Common.GetDateInt());
             foreach (var item in data)
             {
-                var ProcessName = item.this_prosses_name;
-                var SpendTime = item.spend_time;
+                var processName = item.this_prosses_name;
+                var spendTime = item.spend_time;
 
-                if (PieDataContent.ContainsKey(ProcessName))
+                if (PieDataContent.ContainsKey(processName))
                 {
-                    PieDataContent[ProcessName] += SpendTime;
+                    PieDataContent[processName] += spendTime;
                 }
                 else
                 {
-                    PieDataContent.Add(ProcessName,SpendTime);
+                    PieDataContent.Add(processName,spendTime);
                 }
             }
 
             SeriesCollection = new SeriesCollection();
 
-
+            var tempList  = PieDataContent.OrderByDescending(s => s.Value).ToList();
             Dispatcher.Invoke(() =>
             {
-                foreach (var pieData in PieDataContent)
+                List<ListViewShowData> listViewmDataList = new List<ListViewShowData>();
+
+                foreach (var pieData in tempList)
                 {
                     SeriesCollection.Add(new PieSeries()
                     {
                         Title = pieData.Key,
                         Values = new ChartValues<double> { pieData.Value }
                     });
-                }
 
-                DataContext = this;
+                    listViewmDataList.Add(new ListViewShowData()
+                    {
+                        SpendTime = pieData.Value,
+                        ProcessName = pieData.Key
+                    });
+                }
+                DailyListView.ItemsSource = listViewmDataList;
+                DailyDataSeries.Series = SeriesCollection;
             });
         }
 
+        #endregion
 
+        /// <summary>
+        /// 切换显示的时候自动重新加载数据
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DayRowSeries_OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (Visibility == Visibility.Visible)
+            {
+                new Thread(GetDailyData).Start();
+            }
+        }
+    }
 
-        #endregion 
+    public class ListViewShowData
+    {
+        private string _mainTitle;
+        private string _processName;
+        private string _iconPath;
+        private long _spendTime;
 
+        public string IconPath { get => Environment.CurrentDirectory + $"\\icon\\{ProcessName}.png"; set => _iconPath = value; }
+        public string MainTitle { get => _mainTitle; set => _mainTitle = value; }
+        public string ProcessName { get => _processName; set => _processName = value; }
+        public long SpendTime { get => _spendTime; set => _spendTime = value; }
     }
 }

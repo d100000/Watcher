@@ -122,7 +122,6 @@ namespace Watcher
             var activiteNo = GetForegroundWindow();
             foreach (var p in ps)
             {
-
                 if (p.MainWindowHandle != IntPtr.Zero && p.MainWindowTitle != "" && !RunningDictionary.ContainsKey(p.MainWindowHandle))
                 {
                     try
@@ -163,7 +162,7 @@ namespace Watcher
                 NowProcess = runningProcess;
 
                 // 添加前端变化
-                SeriesCollection[0].Values.Add(currentTime - _currentRecordInfo.begin_time);
+                SeriesCollection[0].Values.Add(currentTime - _currentRecordInfo.begin_time+1);
                 Labels.Add(NowProcess.ProcessName);
 
                 if (SeriesCollection[0].Values.Count == 9)
@@ -386,12 +385,17 @@ namespace Watcher
             _notifyIcon.ShowBalloonTip(5000);
         }
 
+        /// <summary>
+        /// 控制全天分析展现
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (MainPanel.Visibility == Visibility.Hidden)
             {
                 MainPanel.Visibility = Visibility.Visible;
-                DayRowSeriesControler.Visibility= Visibility.Hidden;
+                DayRowSeriesControler.Visibility= Visibility.Collapsed;
                 ChangeButton.Content = "每日分析";
             }
             else

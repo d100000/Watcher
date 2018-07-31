@@ -7,17 +7,26 @@
              xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="280" d:DesignWidth="980"
+             IsVisibleChanged="DayRowSeries_OnIsVisibleChanged"
              >
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-        <StackPanel Width="980" Height="300" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="DailyShow" >
+        <StackPanel Width="980" Height="280" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="DailyShow" >
             <Grid Width="500" Height="280">
-                <wpf:PieChart  Height="260"  Name="DailyDataSeries" LegendLocation="Bottom"  Series="{Binding SeriesCollection}">
+                <wpf:PieChart  Height="260"  Name="DailyDataSeries" LegendLocation="Bottom" >
 
                 </wpf:PieChart>
             </Grid>
             <Grid>
-                <ListView>
-                    
+                <ListView Width="480" Height="280" Name="DailyListView">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel  Height="25" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                <TextBlock Margin="3 0 3 0"  TextAlignment="Left" Width="40" Height="18" Text="{Binding SpendTime}"></TextBlock>
+                                <Image Height="18" Source="{Binding IconPath}" Stretch="Fill" Width="18" VerticalAlignment="Center" HorizontalAlignment="Center"></Image>
+                                <TextBlock Margin="10 0 0 0" Height="18" Text="{Binding ProcessName}" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
                 </ListView>
             </Grid>
         </StackPanel>
