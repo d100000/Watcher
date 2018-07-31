@@ -51,7 +51,7 @@ namespace Watcher.UserControlerModel
         public void GetDailyData()
         {
             PieDataContent = new Dictionary<string, long>();
-            var data = MainRecordDbService.QueryByDate(Common.GetDateInt());
+            var data = MainRecordDbService.QueryByDate(MainData.SelectDayTime);
             foreach (var item in data)
             {
                 var processName = item.this_prosses_name;

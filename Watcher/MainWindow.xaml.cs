@@ -13,6 +13,7 @@ using System.Threading;
 
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using Helper;
 using LiveCharts;
@@ -20,6 +21,7 @@ using LiveCharts.Wpf;
 using Watcher.db;
 using Watcher.Entity;
 using Application = System.Windows.Application;
+using Control = System.Windows.Forms.Control;
 using MessageBox = System.Windows.MessageBox;
 
 namespace Watcher
@@ -72,6 +74,8 @@ namespace Watcher
             InitializeComponent();
 
             SetIcon();// 最小化
+
+            InitComboBox();// 初始化下拉框
 
             _t.Elapsed += ProcessTimer;
 
@@ -200,7 +204,7 @@ namespace Watcher
 
                 });
 
-                if (_countUpdate == 5)// 五秒主动更新一次数据库
+                if (_countUpdate == 5&& _currentRecordInfo!=null)// 五秒主动更新一次数据库
                 {
                     currentTime = Common.GetTimeStamp(DateTime.Now);
                     MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time) }, new { _currentRecordInfo.record_id });
@@ -209,6 +213,7 @@ namespace Watcher
                 // 更新图表信息
                 Dispatcher.Invoke(() =>
                 {
+
                     MainRowSeries.Series = SeriesCollection;
                     DataContext = this;
                 });
@@ -376,6 +381,39 @@ namespace Watcher
         }
 
         /// <summary>
+        /// 初始化下拉框
+        /// </summary>
+        public void InitComboBox()
+        {
+            SelectDateTime.ItemsSource=new List<string>()
+            {
+                "当天",
+                "昨天"
+            };
+            SelectDateTime.SelectedItem = "当天";
+        }
+
+        /// <summary>
+        /// 下拉框选项变更触发
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SelectDateTime_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            switch (SelectDateTime.SelectedItem)
+            {
+                case "当天":
+                    MainData.SelectDayTime = Common.GetDateInt();
+                    break;
+                case "昨天":
+                    MainData.SelectDayTime = Common.GetDateInt()-1;
+                    break;
+            }
+            DayRowSeriesControler.GetDailyData();
+        }
+
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="tips"></param>
@@ -396,19 +434,25 @@ namespace Watcher
             {
                 MainPanel.Visibility = Visibility.Visible;
                 DayRowSeriesControler.Visibility= Visibility.Collapsed;
+                SelectDailyStackPanel.Visibility= Visibility.Collapsed;
                 ChangeButton.Content = "每日分析";
             }
             else
             {
                 MainPanel.Visibility = Visibility.Hidden;
                 DayRowSeriesControler.Visibility = Visibility.Visible;
+                SelectDailyStackPanel.Visibility = Visibility.Visible;
                 ChangeButton.Content = "实时数据";
             }
 
         }
+
+
     }
 
     public static class MainData{
         public static RecordDbService MainRecordDbService=new RecordDbService();
+
+        public static long SelectDayTime = Common.GetDateInt();
     }
 }

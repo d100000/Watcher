@@ -19,7 +19,14 @@
         <StackPanel Orientation="Vertical" >
             <Grid Height="30" >
                 <TextBlock  Name="ForegroundTextBox" HorizontalAlignment="Left" Margin="10,6,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
-                <Button Name="ChangeButton" HorizontalAlignment="Right" Content="每日分析" Margin="2 5 10 5" Click="Button_Click"></Button>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom"   >
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom"  Margin="0 0 10 0" Name="SelectDailyStackPanel" Visibility="Collapsed">
+                        <TextBlock TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center">数据时间段：</TextBlock>
+                        <ComboBox Name="SelectDateTime" SelectionChanged="SelectDateTime_OnSelectionChanged" Width="50"  Margin="2 5 10 5" ></ComboBox>
+                    </StackPanel>
+                    <TextBlock TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center">数据维度：</TextBlock>
+                    <Button Name="ChangeButton"  Content="每日分析" Margin="2 5 10 5" Click="Button_Click"></Button>
+                </StackPanel>
             </Grid>
             <Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="MainPanel"  >

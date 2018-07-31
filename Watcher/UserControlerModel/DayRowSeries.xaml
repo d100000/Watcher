@@ -21,7 +21,11 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel  Height="25" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                <TextBlock Margin="3 0 3 0"  TextAlignment="Left" Width="40" Height="18" Text="{Binding SpendTime}"></TextBlock>
+                                <StackPanel Margin="3 0 3 0" Height="25" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Width="90">
+                                    <TextBlock  TextAlignment="Left"  Height="18" Text="共运行"></TextBlock>
+                                    <TextBlock   TextAlignment="Left"  Height="18" Text="{Binding SpendTime}"></TextBlock>
+                                    <TextBlock   TextAlignment="Left"  Height="18"  Text="秒" ></TextBlock>
+                                </StackPanel>
                                 <Image Height="18" Source="{Binding IconPath}" Stretch="Fill" Width="18" VerticalAlignment="Center" HorizontalAlignment="Center"></Image>
                                 <TextBlock Margin="10 0 0 0" Height="18" Text="{Binding ProcessName}" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
                             </StackPanel>
