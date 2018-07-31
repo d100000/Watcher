@@ -46,7 +46,7 @@ namespace Watcher.db
             recordDate.begin_time = Common.GetTimeStamp(DateTime.Now); 
             recordDate.end_time = Common.GetTimeStamp(DateTime.Now);
             recordDate.date = Common.GetDateInt(DateTime.Now);
-            recordDate.create_time = Common.GetTimeStamp(DateTime.Now);
+            recordDate.create_time = Common.GetTimeStamp(DateTime.Now).ToString();
             return Insert(recordDate);
         }
 
@@ -59,6 +59,11 @@ namespace Watcher.db
         public List<recode_info> QueryByDate(int date)
         {
             return GetDBClient().Select<recode_info>(x => x.date >= date);
+        }
+
+        public List<recode_info> QueryByDate(long date)
+        {
+            return GetDBClient().Select<recode_info>(x => x.date == date);
         }
 
         public recode_info Insert(recode_info entity)

@@ -13,9 +13,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Helper;
 using LiveCharts;
 using LiveCharts.Defaults;
 using LiveCharts.Wpf;
+using Watcher.db;
 
 namespace Watcher.UserControlerModel
 {
@@ -25,10 +27,13 @@ namespace Watcher.UserControlerModel
     public partial class DayRowSeries : UserControl
     {
         public SeriesCollection SeriesCollection { get; set; }
-        public string[] Labels { get; set; }
-        public Func<double, string> YFormatter { get; set; }
 
-        public Dictionary<string, int> RowKeyDictionary=new Dictionary<string, int>();
+        public Dictionary<string,long> PieDataContent=new Dictionary<string, long>();
+
+        /// <summary>
+        /// 记录表DB model
+        /// </summary>
+        public static RecordDbService MainRecordDbService = MainData.MainRecordDbService;
 
         public DayRowSeries()
         {
@@ -36,34 +41,65 @@ namespace Watcher.UserControlerModel
 
             SeriesCollection = new SeriesCollection
             {
-                new RowSeries
+                new PieSeries()
                 {
                     Title = "2015",
-                    Values = new ChartValues<double> { 10, 50, 39, 50 }
+                    Values = new ChartValues<double> { 50 }
+                },
+                new PieSeries()
+                {
+                    Title = "2017",
+                    Values = new ChartValues<double> { 50 }
                 }
             };
 
-            Labels = new[] { "Maria", "Susan", "Charles", "Frida" };
+            new Thread(GetDailyData).Start();
 
-            Task.Run(() =>
+            DataContext = this;
+        }
+
+
+        #region  异步获取数据库数据
+
+        public void GetDailyData()
+        {
+            var data = MainRecordDbService.QueryByDate(Common.GetDateInt());
+            foreach (var item in data)
             {
-                var r = new Random();
-                while (true)
-                {
-                    Thread.Sleep(3000);
-                    double _trend =r.Next(5, 100);
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        var tempList= Labels.ToList();
-                        tempList.Add(_trend.ToString());
-                        Labels = tempList.ToArray();
-                        SeriesCollection[0].Values.Add(_trend);
+                var ProcessName = item.this_prosses_name;
+                var SpendTime = item.spend_time;
 
-                        DataContext = this;
+                if (PieDataContent.ContainsKey(ProcessName))
+                {
+                    PieDataContent[ProcessName] += SpendTime;
+                }
+                else
+                {
+                    PieDataContent.Add(ProcessName,SpendTime);
+                }
+            }
+
+            SeriesCollection = new SeriesCollection();
+
+
+            Dispatcher.Invoke(() =>
+            {
+                foreach (var pieData in PieDataContent)
+                {
+                    SeriesCollection.Add(new PieSeries()
+                    {
+                        Title = pieData.Key,
+                        Values = new ChartValues<double> { pieData.Value }
                     });
                 }
-            });
 
+                DataContext = this;
+            });
         }
+
+
+
+        #endregion 
+
     }
 }

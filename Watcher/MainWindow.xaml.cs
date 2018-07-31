@@ -20,6 +20,7 @@ using LiveCharts.Wpf;
 using Watcher.db;
 using Watcher.Entity;
 using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Watcher
 {
@@ -35,7 +36,7 @@ namespace Watcher
         /// <summary>
         /// 记录表DB model
         /// </summary>
-        public RecordDbService MainRecordDbService;
+        public static RecordDbService MainRecordDbService=MainData.MainRecordDbService;
 
         public bool MonitorSwitch = true;
 
@@ -69,7 +70,6 @@ namespace Watcher
         public MainWindow()
         {
             InitializeComponent();
-            MainRecordDbService = new RecordDbService();// 初始化
 
             SetIcon();// 最小化
 
@@ -90,9 +90,16 @@ namespace Watcher
                     Values = new ChartValues<long> {  }
                 }
             };
-
             Labels = new List<string>();
-
+            try
+            {
+                GetProssesList();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("内部启动错误GetProssesList: " + e.Message + e.StackTrace, "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        
         }
 
         public void ProcessTimer(object source, System.Timers.ElapsedEventArgs e)
@@ -124,7 +131,7 @@ namespace Watcher
                     }
                     catch (Exception ex)
                     {
-                        // ignored
+                        
                     }
 
                     RunningDictionary.Add(p.MainWindowHandle, new ProcessInfo()
@@ -178,14 +185,22 @@ namespace Watcher
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    MessageBox.Show("内部启动错误: " + e.Message + e.Data, "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Warning);
                     Application.Current.Shutdown();
                 }
             }
             else
             {
-                SeriesCollection[0].Values[SeriesCollection[0].Values.Count - 1] =
-                    currentTime - _currentRecordInfo.begin_time;
+                Dispatcher.Invoke(() =>
+                {
+                    if (SeriesCollection[0].Values.Count > 0)
+                    {
+                        SeriesCollection[0].Values[SeriesCollection[0].Values.Count - 1] =
+                            Common.GetTimeStamp(DateTime.Now) - _currentRecordInfo.begin_time;
+                    }
+
+                });
+
                 if (_countUpdate == 5)// 五秒主动更新一次数据库
                 {
                     currentTime = Common.GetTimeStamp(DateTime.Now);
@@ -332,7 +347,7 @@ namespace Watcher
                         this_prosses_id = NowProcess.Id.ToString(),
                         this_prosses_name = @"鼠标静止",
                         this_prosses_title = @"UnActivate",
-                        create_time = Common.GetTimeStamp(),
+                        create_time = Common.GetTimeStamp().ToString(),
                     });
                 }
                 MouseLocation = currentLocation;
@@ -370,5 +385,26 @@ namespace Watcher
             _notifyIcon.BalloonTipText = tips;
             _notifyIcon.ShowBalloonTip(5000);
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (MainPanel.Visibility == Visibility.Hidden)
+            {
+                MainPanel.Visibility = Visibility.Visible;
+                DayRowSeriesControler.Visibility= Visibility.Hidden;
+                ChangeButton.Content = "每日分析";
+            }
+            else
+            {
+                MainPanel.Visibility = Visibility.Hidden;
+                DayRowSeriesControler.Visibility = Visibility.Visible;
+                ChangeButton.Content = "实时数据";
+            }
+
+        }
+    }
+
+    public static class MainData{
+        public static RecordDbService MainRecordDbService=new RecordDbService();
     }
 }

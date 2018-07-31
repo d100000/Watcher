@@ -27,7 +27,7 @@ namespace Watcher.Entity
         public string this_prosses_id { get; set; }
         public string this_prosses_title { get; set; }
         public string this_prosses_name { get; set; }
-        public Int64 create_time { get; set; }
+        public string create_time { get; set; }
 
 
     }

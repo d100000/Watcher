@@ -6,15 +6,20 @@
              xmlns:local="clr-namespace:Watcher.UserControlerModel"
              xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <wpf:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Bottom">
-            <wpf:CartesianChart.AxisY>
-                <wpf:Axis Title="Sold Apps" Labels="{Binding Labels}"></wpf:Axis>
-            </wpf:CartesianChart.AxisY>
-            <wpf:CartesianChart.DataTooltip>
-                <wpf:DefaultTooltip SelectionMode="SharedYValues"></wpf:DefaultTooltip>
-            </wpf:CartesianChart.DataTooltip>
-        </wpf:CartesianChart>
+             d:DesignHeight="280" d:DesignWidth="980"
+             >
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <StackPanel Width="980" Height="300" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="DailyShow" >
+            <Grid Width="500" Height="280">
+                <wpf:PieChart  Height="260"  Name="DailyDataSeries" LegendLocation="Bottom"  Series="{Binding SeriesCollection}">
+
+                </wpf:PieChart>
+            </Grid>
+            <Grid>
+                <ListView>
+                    
+                </ListView>
+            </Grid>
+        </StackPanel>
     </Grid>
 </UserControl>

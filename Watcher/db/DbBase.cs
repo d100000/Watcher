@@ -28,7 +28,7 @@ namespace Watcher.db
         public DbBase()
         {
 
-            if (!Directory.Exists(db_path))
+            if (!File.Exists(db_path))// 修复覆盖db文件的ebug
             {
                 SQLiteConnection.CreateFile(db_path);
             }

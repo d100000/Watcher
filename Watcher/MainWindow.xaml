@@ -14,35 +14,46 @@
         Closing="MainWindow_OnClosing"
         
         mc:Ignorable="d"
-        Title="程序记录软件" Height="350" Width="1000">
+        Title="程序记录软件" Height="380" Width="1000">
     <Grid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-            <Grid  Width="500">
-                <wpf:CartesianChart  Name="MainRowSeries" LegendLocation="Bottom">
-                    <wpf:CartesianChart.AxisY>
-                        <wpf:Axis Title="Time" Labels="{Binding Labels}"></wpf:Axis>
-                    </wpf:CartesianChart.AxisY>
-                    <wpf:CartesianChart.DataTooltip>
-                        <wpf:DefaultTooltip SelectionMode="SharedYValues"></wpf:DefaultTooltip>
-                    </wpf:CartesianChart.DataTooltip>
-                </wpf:CartesianChart>
+        <StackPanel Orientation="Vertical" >
+            <Grid Height="30" >
+                <TextBlock  Name="ForegroundTextBox" HorizontalAlignment="Left" Margin="10,6,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+                <Button Name="ChangeButton" HorizontalAlignment="Right" Content="每日分析" Margin="2 5 10 5" Click="Button_Click"></Button>
             </Grid>
             <Grid>
-                <ListBox  Name="MainListBox"  HorizontalAlignment="Left" Height="279" VerticalAlignment="Top" Width="486">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Height="25" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" >
-                                <Image Height="18" Source="{Binding IconPath}" Stretch="Fill" Width="18" VerticalAlignment="Center" HorizontalAlignment="Center"></Image>
-                                <TextBlock Margin="10 0 0 0" Height="18" Text="{Binding MainTitle}" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                
-            </Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Name="MainPanel"  >
+                    <Grid  Width="500" Height="300">
+                        <wpf:CartesianChart  Name="MainRowSeries" LegendLocation="Bottom">
+                            <wpf:CartesianChart.AxisY>
+                                <wpf:Axis Title="Time" Labels="{Binding Labels}"></wpf:Axis>
+                            </wpf:CartesianChart.AxisY>
+                            <wpf:CartesianChart.DataTooltip>
+                                <wpf:DefaultTooltip SelectionMode="SharedYValues"></wpf:DefaultTooltip>
+                            </wpf:CartesianChart.DataTooltip>
+                        </wpf:CartesianChart>
+                    </Grid>
+                    <Grid>
+                        <ListBox  Name="MainListBox"  HorizontalAlignment="Left" VerticalAlignment="Top" Width="486" Height="300">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Height="25" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" >
+                                        <Image Height="18" Source="{Binding IconPath}" Stretch="Fill" Width="18" VerticalAlignment="Center" HorizontalAlignment="Center"></Image>
+                                        <TextBlock Margin="10 0 0 0" Height="18" Text="{Binding MainTitle}" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
 
+                    </Grid>
+
+                </StackPanel>
+                <userControlerModel:DayRowSeries x:Name="DayRowSeriesControler" Visibility="Hidden"></userControlerModel:DayRowSeries>
+
+            </Grid>
         </StackPanel>
-        <TextBlock Name="ForegroundTextBox" HorizontalAlignment="Left" Margin="10,6,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        
+        
     </Grid>
 </Window>
 

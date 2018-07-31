@@ -154,7 +154,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="lib\" />
+    <Folder Include="Lib\" />
+    <Folder Include="Windows\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Easyliter\Easyliter.csproj">
