@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Easyliter", "Easyliter\Easy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helper", "NetHelper\Helper.csproj", "{12907A3A-E6B3-4575-8A58-4B568647C402}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Update", "Update\Update.csproj", "{CCDAFA08-2097-4DD0-B4B1-0F033651AB98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{12907A3A-E6B3-4575-8A58-4B568647C402}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12907A3A-E6B3-4575-8A58-4B568647C402}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12907A3A-E6B3-4575-8A58-4B568647C402}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCDAFA08-2097-4DD0-B4B1-0F033651AB98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCDAFA08-2097-4DD0-B4B1-0F033651AB98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCDAFA08-2097-4DD0-B4B1-0F033651AB98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCDAFA08-2097-4DD0-B4B1-0F033651AB98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
