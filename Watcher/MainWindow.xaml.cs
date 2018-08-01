@@ -73,17 +73,28 @@ namespace Watcher
         {
             InitializeComponent();
 
+            Dictionary<string, int> array = new Dictionary<string, int>();
+            for (int i = 0; i < 10000000; i++)
+            {
+                var randStr = Common.GetRandOnlyId();
+                if (array.ContainsKey(randStr))
+                {
+                    MessageBox.Show($"重复随机数第{i}个重复！");
+                }
+                else
+                {
+                    array.Add(randStr, i);
+                }
+
+            }
+            MessageBox.Show("无重复！");
+
+            return;
+
             SetIcon();// 最小化
 
             InitComboBox();// 初始化下拉框
 
-            _t.Elapsed += ProcessTimer;
-
-            //到达时间的时候执行事件；   
-
-            _t.AutoReset = true;
-
-            _t.Enabled = true;
 
             // 主页面条形图数据
             SeriesCollection = new SeriesCollection
@@ -104,6 +115,18 @@ namespace Watcher
                 MessageBox.Show("内部启动错误GetProssesList: " + e.Message + e.StackTrace, "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         
+        }
+
+        public void StartTimer()
+        {
+            _t.Elapsed += ProcessTimer;
+
+            //到达时间的时候执行事件；   
+
+            _t.AutoReset = true;
+
+            _t.Enabled = true;
+
         }
 
         public void ProcessTimer(object source, System.Timers.ElapsedEventArgs e)
