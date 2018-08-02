@@ -140,7 +140,7 @@ namespace Watcher
                     }
                     catch (Exception ex)
                     {
-                        
+                        // ignored
                     }
 
                     RunningDictionary.Add(p.MainWindowHandle, new ProcessInfo()
@@ -238,16 +238,16 @@ namespace Watcher
         /// <summary>
         /// 通过程序路径获取图标信息
         /// </summary>
-        /// <param name="FilePath"></param>
+        /// <param name="filePath"></param>
         /// <param name="appName"></param>
         /// <returns></returns>
-        public Icon GetIcon(string FilePath, string appName)
+        public Icon GetIcon(string filePath, string appName)
         {
 
             var returnData = new List<Icon>();
             var imageList = new ImageList();
 
-            var icon = System.Drawing.Icon.ExtractAssociatedIcon(FilePath); //图标添加进imageList中
+            var icon = System.Drawing.Icon.ExtractAssociatedIcon(filePath); //图标添加进imageList中
             imageList.Images.Add(icon);
             returnData.Add(icon);
 
