@@ -7,6 +7,7 @@
              xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="280" d:DesignWidth="980"
+             Loaded="DayRowSeries_OnLoaded"
              IsVisibleChanged="DayRowSeries_OnIsVisibleChanged"
              >
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">

@@ -40,16 +40,17 @@ namespace Watcher.UserControlerModel
         {
             InitializeComponent();
 
-            SeriesCollection = new SeriesCollection();
 
-            new Thread(GetDailyData).Start();
         }
+       
 
 
         #region  异步获取数据库数据
 
         public void GetDailyData()
         {
+            SeriesCollection = new SeriesCollection();
+
             PieDataContent = new Dictionary<string, long>();
             var data = MainRecordDbService.QueryByDate(MainData.SelectDayTime);
             foreach (var item in data)
@@ -67,7 +68,6 @@ namespace Watcher.UserControlerModel
                 }
             }
 
-            SeriesCollection = new SeriesCollection();
 
             var tempList  = PieDataContent.OrderByDescending(s => s.Value).ToList();
             Dispatcher.Invoke(() =>
@@ -106,6 +106,12 @@ namespace Watcher.UserControlerModel
             {
                 new Thread(GetDailyData).Start();
             }
+        }
+
+        private void DayRowSeries_OnLoaded(object sender, RoutedEventArgs e)
+        {
+
+            new Thread(GetDailyData).Start();
         }
     }
 

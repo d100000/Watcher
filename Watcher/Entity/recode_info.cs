@@ -18,7 +18,7 @@ namespace Watcher.Entity
 
         public Int64 spend_time
         {
-            get => end_time-begin_time;
+            get => end_time-begin_time+1;
             set => _spend_time = value;
         }
 

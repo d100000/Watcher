@@ -31,6 +31,7 @@ namespace Watcher
     /// </summary>
     public partial class MainWindow
     {
+        public bool IsNoti;
 
         public List<string> ProcessList = new List<string>();
 
@@ -77,8 +78,6 @@ namespace Watcher
 
             InitComboBox();// 初始化下拉框
 
-            StartTimer();// 开启定时任务
-
             // 主页面条形图数据
             SeriesCollection = new SeriesCollection
             {
@@ -97,7 +96,8 @@ namespace Watcher
             {
                 MessageBox.Show("内部启动错误GetProssesList: " + e.Message + e.StackTrace, "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-        
+
+            StartTimer();// 开启定时任务
         }
 
         public void StartTimer()
@@ -213,14 +213,15 @@ namespace Watcher
                 if (_countUpdate == 5&& _currentRecordInfo!=null)// 五秒主动更新一次数据库
                 {
                     currentTime = Common.GetTimeStamp(DateTime.Now);
-                    MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time) }, new { _currentRecordInfo.record_id });
+                    MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time+1) }, new { _currentRecordInfo.record_id });
                     _countUpdate = 0;
                 }
                 // 更新图表信息
                 Dispatcher.Invoke(() =>
                 {
-
                     MainRowSeries.Series = SeriesCollection;
+                    ForegroundSecondTextBox.Text = " 运行" + (currentTime - _currentRecordInfo.begin_time+1) + "秒";
+                    ForegroundTextBox.Text = activiteProssesName;
                     DataContext = this;
                 });
                 _countUpdate++;
@@ -277,7 +278,12 @@ namespace Watcher
         {
             if (WatcherMainWindows.WindowState != WindowState.Minimized) return;
             Hide();
-            NotifyTips("主人，我隐藏在了右下角哦！");
+            if (!IsNoti)
+            {
+                NotifyTips("主人，我隐藏在了右下角哦！");
+                IsNoti = true;
+            }
+
         }
 
         /// <summary>
@@ -287,14 +293,12 @@ namespace Watcher
         {
             _notifyIcon = new NotifyIcon
             {
-                BalloonTipText = @"软件启动啦，主人！",
                 Text = @"守望者程序 Watcher",
                 Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath),
                 Visible = true
             };
 
             _notifyIcon.MouseDoubleClick += OnNotifyIconDoubleClick;
-            _notifyIcon.ShowBalloonTip(1000);
 
             var cms = new ContextMenuStrip();
             //关联 NotifyIcon 和 ContextMenuStrip
@@ -317,7 +321,11 @@ namespace Watcher
         {
             e.Cancel = true;
             Hide();
-            NotifyTips("主人我没有消失，我在右下角哦！");
+            if (!IsNoti)
+            {
+                NotifyTips("主人，我隐藏在了右下角哦！");
+                IsNoti = true;
+            }
         }
 
 
@@ -363,8 +371,6 @@ namespace Watcher
                 MouseLocation = currentLocation;
                 MouseStopCount = 0;
             }
-
-
         }
 
 
@@ -454,6 +460,11 @@ namespace Watcher
         }
 
 
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            MainFlyout.IsOpen = !MainFlyout.IsOpen;
+
+        }
     }
 
     public static class MainData{
