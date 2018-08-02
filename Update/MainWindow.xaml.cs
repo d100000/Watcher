@@ -55,7 +55,6 @@ namespace Update
 
         private string OnlineVersionUrl = @"https://api.bobdong.cn/time_manager/system/get_system_data";
 
-
         public MainWindow()
         {
             InitializeComponent();

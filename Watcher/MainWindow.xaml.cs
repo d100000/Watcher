@@ -73,28 +73,11 @@ namespace Watcher
         {
             InitializeComponent();
 
-            Dictionary<string, int> array = new Dictionary<string, int>();
-            for (int i = 0; i < 10000000; i++)
-            {
-                var randStr = Common.GetRandOnlyId();
-                if (array.ContainsKey(randStr))
-                {
-                    MessageBox.Show($"重复随机数第{i}个重复！");
-                }
-                else
-                {
-                    array.Add(randStr, i);
-                }
-
-            }
-            MessageBox.Show("无重复！");
-
-            return;
-
             SetIcon();// 最小化
 
             InitComboBox();// 初始化下拉框
 
+            StartTimer();// 开启定时任务
 
             // 主页面条形图数据
             SeriesCollection = new SeriesCollection
@@ -364,7 +347,7 @@ namespace Watcher
             }
             else
             {
-                if (MouseStopCount > 10)// 鼠标停止湿巾大于10秒
+                if (MouseStopCount > 300)// 鼠标停止时间大于5分钟
                 {
                     MainRecordDbService.Insert(new recode_info()
                     {
@@ -443,7 +426,7 @@ namespace Watcher
         public void NotifyTips(string tips)
         {
             _notifyIcon.BalloonTipText = tips;
-            _notifyIcon.ShowBalloonTip(5000);
+            _notifyIcon.ShowBalloonTip(1000);
         }
 
         /// <summary>
