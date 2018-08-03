@@ -4,7 +4,7 @@
 
 ## 下载地址  
 
-> [http://api.bobdong.cn/public/static/Win/Watcher守望者.exe](http://api.bobdong.cn/public/static/Win/Watcher守望者.exe)  
+> [http://api.bobdong.cn/public/static/Win/Watcher.exe](http://api.bobdong.cn/public/static/Win/Watcher守望者.exe)  
 
 
 ## 功能  
