@@ -14,7 +14,7 @@
         StateChanged="MainWindow_OnStateChanged"
         Closing="MainWindow_OnClosing"
         Icon="bitbug_favicon.ico"
-                 
+        Loaded="MainWindow_OnLoaded"
         GlowBrush="{DynamicResource AccentColorBrush}" 
         
         mc:Ignorable="d"

@@ -31,7 +31,7 @@ namespace Watcher
     /// </summary>
     public partial class MainWindow
     {
-        public bool IsNoti;
+        public bool IsNoti;// 判断是否已经提醒过，不在重复提醒
 
         public List<string> ProcessList = new List<string>();
 
@@ -74,6 +74,11 @@ namespace Watcher
         {
             InitializeComponent();
 
+        }
+
+        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+
             SetIcon();// 最小化
 
             InitComboBox();// 初始化下拉框
@@ -88,18 +93,13 @@ namespace Watcher
                 }
             };
             Labels = new List<string>();
-            try
-            {
-                GetProssesList();
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("内部启动错误GetProssesList: " + e.Message + e.StackTrace, "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
 
             StartTimer();// 开启定时任务
         }
 
+        /// <summary>
+        /// 开启定时器
+        /// </summary>
         public void StartTimer()
         {
             _t.Elapsed += ProcessTimer;
@@ -194,7 +194,7 @@ namespace Watcher
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("内部启动错误: " + e.Message + e.Data, "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("内部启动错误: " + e.Message + e.Data, "Watcher  Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     Application.Current.Shutdown();
                 }
             }
@@ -216,14 +216,17 @@ namespace Watcher
                     MainRecordDbService.Update(new { end_time = currentTime, spend_time = (currentTime - _currentRecordInfo.begin_time+1) }, new { _currentRecordInfo.record_id });
                     _countUpdate = 0;
                 }
-                // 更新图表信息
-                Dispatcher.Invoke(() =>
+                if (_currentRecordInfo != null)
                 {
-                    MainRowSeries.Series = SeriesCollection;
-                    ForegroundSecondTextBox.Text = " 运行" + (currentTime - _currentRecordInfo.begin_time+1) + "秒";
-                    ForegroundTextBox.Text = activiteProssesName;
-                    DataContext = this;
-                });
+                    // 更新图表信息
+                    Dispatcher.Invoke(() =>
+                    {
+                        MainRowSeries.Series = SeriesCollection;
+                        ForegroundSecondTextBox.Text = " 运行" + (currentTime - _currentRecordInfo.begin_time + 1) + "秒";
+                        ForegroundTextBox.Text = activiteProssesName;
+                        DataContext = this;
+                    });
+                }
                 _countUpdate++;
             }
 
@@ -276,6 +279,11 @@ namespace Watcher
 
         private void MainWindow_OnStateChanged(object sender, EventArgs e)
         {
+            if (MainData.IsOpenFail)
+            {
+                Environment.Exit(0);
+            }
+
             if (WatcherMainWindows.WindowState != WindowState.Minimized) return;
             Hide();
             if (!IsNoti)
@@ -465,11 +473,15 @@ namespace Watcher
             MainFlyout.IsOpen = !MainFlyout.IsOpen;
 
         }
+
+
     }
 
     public static class MainData{
         public static RecordDbService MainRecordDbService=new RecordDbService();
 
         public static long SelectDayTime = Common.GetDateInt();
+
+        public static bool IsOpenFail = false;
     }
 }
